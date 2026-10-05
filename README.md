@@ -115,9 +115,7 @@ by [MSYS2](https://www.msys2.org/), along with MinGW-w64 (GCC) and Ninja.
 
 When using GCC, all commands in the following sections should be run from an MSYS2 MinGW64 shell.
 
-#### Prerequisites
-
-Install the required MSYS2 packages:
+#### Install the required MSYS2 packages
 
 ```sh
 pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-git mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-python
@@ -125,16 +123,7 @@ pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-git mingw-w64-x86_64-cmake mingw
 
 #### Clone Source and Dependencies 
 
-```sh
-git clone https://github.com/KhronosGroup/OpenCL-CTS.git
-git clone https://github.com/KhronosGroup/OpenCL-Headers.git
-git clone https://github.com/KhronosGroup/SPIRV-Headers.git
-git clone https://github.com/KhronosGroup/OpenCL-ICD-Loader.git
-git clone https://github.com/KhronosGroup/SPIRV-Tools.git
-git clone https://github.com/KhronosGroup/SPIRV-Headers.git SPIRV-Tools/external/spirv-headers
-git clone https://github.com/google/effcee.git SPIRV-Tools/external/effcee
-git clone https://github.com/google/re2.git SPIRV-Tools/external/re2
-```
+Launch an MSYS2 MinGW64 shell and perform the procedure using the same instructions as for Linux.
 
 #### Build the ICD Loader
 
