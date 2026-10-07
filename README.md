@@ -61,7 +61,7 @@ cmake -S OpenCL-CTS -B OpenCL-CTS/build \
 cmake --build OpenCL-CTS/build --config Release
 ```
 
-## Running the CTS
+#### Running the CTS
 
 A build of the CTS contains multiple executables representing the directories in
 the `test_conformance` folder. Each of these executables contains sub-tests, and
@@ -125,7 +125,7 @@ When using GCC, all commands must be run from an MSYS2 MinGW64 shell. The requir
 
 An example of these steps can be found in the [github CI workflow](https://github.com/KhronosGroup/OpenCL-CTS/blob/main/.github/workflows/presubmit.yml) (job: `build-windows-msys2`).
 
-#### Running Tests
+#### Running Tests on Windows
 
 The compiled executables must be run from a Windows Command Prompt (cmd.exe) or PowerShell session.
 Running them directly from the MSYS2 shell is not supported, as MSYS2 Bash may fail to launch the
