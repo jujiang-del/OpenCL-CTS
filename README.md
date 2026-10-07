@@ -106,58 +106,31 @@ require compilation, these are:
 
 ### Building CTS on Windows
 
-On Windows, CTS can be built with the MSVC compiler by following the same instructions used for
+On Windows, CTS can be built with the MSVC compiler by following the same instructions as for
 Linux. However, certain math-related subtests are known to have issues when built with MSVC due
 to precision limitations. For example, some `FP64` tests may fail because `long double` is treated
 as equivalent to `double` in MSVC.
-To avoid these issues, CTS can also be built using the native Windows toolchain provided 
-by [MSYS2](https://www.msys2.org/), along with MinGW-w64 (GCC) and Ninja.
 
-When using GCC, all commands in the following sections should be run from an MSYS2 MinGW64 shell.
+To avoid these issues, CTS can also be built using [MSYS2](https://www.msys2.org/) with MinGW-w64 (GCC) and Ninja.
 
-#### Install the required MSYS2 packages
+#### Building CTS
 
-```sh
-pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-git mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-python
-```
+When using GCC, all commands must be run from an MSYS2 MinGW64 shell. The required steps are:
 
-#### Clone Source and Dependencies 
+  1. Install the required MSYS2 packages
+  2. Clone source and dependencies
+  3. Build the OpenCL-ICD-Loader
+  4. Build SPIRV-Tools
+  5. Build the OpenCL-CTS
 
-Launch an MSYS2 MinGW64 shell and perform the procedure using the same instructions as for Linux.
-
-#### Build the ICD Loader
-
-```sh
-cmake -S OpenCL-ICD-Loader -B OpenCL-ICD-Loader/build -G "Ninja" \
-      -DOPENCL_ICD_LOADER_HEADERS_DIR=$PWD/OpenCL-Headers
-cmake --build OpenCL-ICD-Loader/build --config Release
-```
-
-#### Build SPIRV-Tools
-
-```sh
-cmake -S SPIRV-Tools -B SPIRV-Tools/build -G "Ninja" -DSPIRV_SKIP_TESTS=ON
-cmake --build SPIRV-Tools/build --config Release
-```
-
-#### Build the CTS
-
-```sh
-cmake -S OpenCL-CTS -B OpenCL-CTS/build -G "Ninja" \
-      -DCL_INCLUDE_DIR=$PWD/OpenCL-Headers \
-      -DCL_LIB_DIR=$PWD/OpenCL-ICD-Loader/build \
-      -DSPIRV_INCLUDE_DIR=$PWD/SPIRV-Headers \
-      -DSPIRV_TOOLS_DIR=$PWD/SPIRV-Tools/build/tools \
-      -DOPENCL_LIBRARIES=OpenCL
-cmake --build OpenCL-CTS/build --config Release
-```
+An example of these steps can be found in the [github CI workflow](https://github.com/KhronosGroup/OpenCL-CTS/blob/main/.github/workflows/presubmit.yml) (job: `build-windows-msys2`).
 
 #### Running Tests
 
 The compiled executables must be run from a Windows Command Prompt (cmd.exe) or PowerShell session.
 Running them directly from the MSYS2 shell is not supported, as MSYS2 Bash may fail to launch the
 executables (exit code 127) due to a known interoperability issue with PE binaries that depend on
-system DLLs such as OpenCL.dll.
+system DLLs such as `OpenCL.dll`.
 
 From cmd.exe:
 
