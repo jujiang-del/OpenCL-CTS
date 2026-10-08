@@ -60,8 +60,26 @@ cmake -S OpenCL-CTS -B OpenCL-CTS/build \
       -DOPENCL_LIBRARIES=OpenCL
 cmake --build OpenCL-CTS/build --config Release
 ```
+### Building CTS on Windows
 
-#### Running the CTS
+On Windows, CTS can be built with the MSVC compiler by following the same instructions as for
+Linux. However, certain math-related subtests are known to have issues when built with MSVC due
+to precision limitations. For example, some `FP64` tests may fail because `long double` is treated
+as equivalent to `double` in MSVC.
+
+To avoid these issues, CTS can also be built using [MSYS2](https://www.msys2.org/) with MinGW-w64 (GCC) and Ninja.
+
+When using GCC, all commands must be run from an MSYS2 MinGW64 shell. The required steps are:
+
+  1. Install the required MSYS2 packages
+  2. Clone source and dependencies
+  3. Build the OpenCL-ICD-Loader
+  4. Build SPIRV-Tools
+  5. Build the OpenCL-CTS
+
+An example of these steps can be found in the [github CI workflow](https://github.com/KhronosGroup/OpenCL-CTS/blob/main/.github/workflows/presubmit.yml) (job: `build-windows-msys2`).
+
+## Running the CTS
 
 A build of the CTS contains multiple executables representing the directories in
 the `test_conformance` folder. Each of these executables contains sub-tests, and
@@ -82,7 +100,49 @@ platform:
 OCL_ICD_FILENAMES=/path/to/vendor_lib.so ./test_basic
 ```
 
-### Offline Compilation
+## Running the CTS
+
+A build of the CTS contains multiple executables representing the directories in
+the `test_conformance` folder. Each executable contains sub-tests, and possibly finer
+granularities of testing within those sub-tests.
+
+See the `--help` output on each executable for the list of available available sub-tests,
+as well as other options for configuring execution.
+
+If the OpenCL library built against is the ICD Loader, and the vendor library to
+be tested is not registered in the
+[default ICD Loader location](https://github.com/KhronosGroup/OpenCL-ICD-Loader#registering-icds)
+then the [OCL_ICD_FILENAMES](https://github.com/KhronosGroup/OpenCL-ICD-Loader#table-of-debug-environment-variables)
+environment variable must be set for the ICD Loader to detect the OpenCL
+library at runtime. For example, to run the basic tests on a Linux:
+
+```sh
+OCL_ICD_FILENAMES=/path/to/vendor_lib.so ./test_basic
+```
+
+On Windows with GCC (MSYS2), the compiled executables must be run from a Windows
+Command Prompt (cmd.exe) or PowerShell session. Running them directly from the
+MSYS2 shell is not supported, as MSYS2 Bash may fail to launch the executables
+(exit code 127) due to a known interoperability issue with PE binaries that
+depend on system DLLs such as `OpenCL.dll`.
+
+From cmd.exe:
+
+```cmd
+set PATH=C:\msys64\mingw64\bin;%PATH%
+cd OpenCL-CTS\build\test_conformance\math_brute_force
+test_bruteforce.exe
+```
+
+Alternatively, launch from the MSYS2 shell:
+
+```sh
+export PATH=/c/msys64/mingw64/bin:$PATH
+cd ./OpenCL-CTS/build/test_conformance/math_brute_force
+./test_bruteforce.exe
+```
+
+## Offline Compilation
 
 Testing OpenCL drivers which do not have a runtime compiler can be done by using
 additional command line arguments provided by the test harness for tests which
@@ -103,50 +163,6 @@ require compilation, these are:
    cl_offline_compiler) invoked by the test harness to perform offline
    compilation of OpenCL-C source code.  This executable must match the
    [interface description](test_common/harness/cl_offline_compiler-interface.txt).
-
-### Building CTS on Windows
-
-On Windows, CTS can be built with the MSVC compiler by following the same instructions as for
-Linux. However, certain math-related subtests are known to have issues when built with MSVC due
-to precision limitations. For example, some `FP64` tests may fail because `long double` is treated
-as equivalent to `double` in MSVC.
-
-To avoid these issues, CTS can also be built using [MSYS2](https://www.msys2.org/) with MinGW-w64 (GCC) and Ninja.
-
-#### Building CTS
-
-When using GCC, all commands must be run from an MSYS2 MinGW64 shell. The required steps are:
-
-  1. Install the required MSYS2 packages
-  2. Clone source and dependencies
-  3. Build the OpenCL-ICD-Loader
-  4. Build SPIRV-Tools
-  5. Build the OpenCL-CTS
-
-An example of these steps can be found in the [github CI workflow](https://github.com/KhronosGroup/OpenCL-CTS/blob/main/.github/workflows/presubmit.yml) (job: `build-windows-msys2`).
-
-#### Running Tests on Windows
-
-The compiled executables must be run from a Windows Command Prompt (cmd.exe) or PowerShell session.
-Running them directly from the MSYS2 shell is not supported, as MSYS2 Bash may fail to launch the
-executables (exit code 127) due to a known interoperability issue with PE binaries that depend on
-system DLLs such as `OpenCL.dll`.
-
-From cmd.exe:
-
-```cmd
-set PATH=C:\msys64\mingw64\bin;%PATH%
-cd OpenCL-CTS\build\test_conformance\math_brute_force
-test_bruteforce.exe
-```
-
-Alternatively, launch from the MSYS2 shell:
-
-```sh
-export PATH=/c/msys64/mingw64/bin:$PATH
-cd ./OpenCL-CTS/build/test_conformance/math_brute_force
-./test_bruteforce.exe
-```
 
 ## Generating a Conformance Report
 
